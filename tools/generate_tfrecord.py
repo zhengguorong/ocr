@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-# python generate_tfrecord.py --txt_input=dataset/test.txt  --output_path=dataset/test.record
-# python generate_tfrecord.py --txt_input=dataset/train.txt  --output_path=dataset/train.record
 
 import tensorflow as tf
 import numpy as np
@@ -9,13 +7,8 @@ from os.path import join
 from scipy.misc import imread, imresize
 import matplotlib.pyplot as plt
 
-flags = tf.app.flags
-flags.DEFINE_string('txt_input', '', 'txt文件路径')
-flags.DEFINE_string('output_path', '', 'tf文件输入路径')
-FLAGS = flags.FLAGS
-
 image_size = 32
-num_labels = 6493
+num_labels = len(open('dataset/y_tag.txt').readlines())
 
 def read_images(path):
   file_object = open(path)
@@ -75,13 +68,14 @@ def read_tf(file):
       print(l[0])
       test_label = tf.one_hot(l[0], num_labels, on_value=1)
       print(test_label.eval())
-      plt.imshow(val[0].reshape(64, 64))
+      plt.imshow(val[0].reshape(32, 32))
       plt.show() 
 
 def main(_):
-  images, labels = read_images(FLAGS.txt_input)
-  covert(images, labels, FLAGS.output_path)
-  # read_tf('data/test.record')
+  test_images, test_labels = read_images('dataset/test.txt')
+  covert(test_images, test_labels, 'dataset/test.record')
+  train_images, train_labels = read_images('dataset/train.txt')
+  covert(train_images, train_labels, 'dataset/train.record')
 
 if __name__ == '__main__':
   tf.app.run()

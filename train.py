@@ -4,9 +4,10 @@ from __future__ import division
 from __future__ import print_function
 import argparse
 import sys
+sys.path.append('tools')
 import tempfile
 import tensorflow as tf
-from tools.generate_tfrecord import read_and_decode
+from generate_tfrecord import read_and_decode
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
@@ -15,8 +16,8 @@ from scipy.misc import imread, imresize
 FLAGS = None
 
 SUMMARY_DIR = "./log/supervisor.log"
-train_file = 'data/train.record'
-test_file = 'data/test.record'
+train_file = 'dataset/train.record'
+test_file = 'dataset/test.record'
 image_size = 32
 num_labels = 6493
 num_channels = 1

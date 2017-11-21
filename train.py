@@ -6,7 +6,7 @@ import argparse
 import sys
 import tempfile
 import tensorflow as tf
-from generate_tfrecord import read_and_decode
+from tools.generate_tfrecord import read_and_decode
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image

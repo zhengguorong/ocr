@@ -19,7 +19,7 @@ SUMMARY_DIR = "./log/supervisor.log"
 train_file = 'dataset/train.record'
 test_file = 'dataset/test.record'
 image_size = 32
-num_labels = 6493
+num_labels = len(open('dataset/y_tag.txt').readlines())
 num_channels = 1
 batch_size = 128
 

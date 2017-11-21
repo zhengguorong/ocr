@@ -21,7 +21,7 @@ test_file = 'dataset/test.record'
 image_size = 32
 num_labels = len(open('dataset/y_tag.txt').readlines())
 num_channels = 1
-batch_size = 128
+batch_size = 40
 
 
 def deepnn(x):

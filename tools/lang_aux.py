@@ -70,13 +70,15 @@ class Font2Image(object):
         self.need_crop = need_crop
         self.margin = margin
 
-    def do(self, font_path, char, path_img):
+    def do(self, font_path, char, path_img, rotate=0):
         find_image_bbox = FindImageBBox()
         img = Image.new("RGB", (self.width, self.height), "black")
         draw = ImageDraw.Draw(img)
         font = ImageFont.truetype(font_path, int(self.width * 0.7),)
         draw.text((0, 0), char, (255, 255, 255),
                   font=font)
+        if rotate != 0:
+            img = img.rotate(rotate)
         data = list(img.getdata())
         sum_val = 0
         for i_data in data:
@@ -98,8 +100,7 @@ class Font2Image(object):
             cv2.imwrite(path_img, np_img)
         else:
             print("%s doesn't exist." % path_img)
-
-
+            
 if __name__ == "__main__":
     lang_chars_gen = LangCharsGenerate("digits+eng")
     lang_chars = lang_chars_gen.do()

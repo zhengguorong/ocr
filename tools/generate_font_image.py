@@ -26,6 +26,8 @@ if __name__ == "__main__":
     NO_CROP = True # 是否裁切
     MARGIN = 4 # 图片边距
     LANGS = 'lower_eng' # 生成什么类型的字体
+    ROTATE = 30 # 生成字体旋转角度
+    ROTATE_STEP = 2 # 步长
 
     out_dataset_dir = os.path.expanduser(OUT_DATASET_DIR)
     font_dir = os.path.expanduser(FONT_DIR)
@@ -35,6 +37,8 @@ if __name__ == "__main__":
     need_crop = not NO_CROP
     margin = int(MARGIN)
     langs = LANGS
+    rotate = int(ROTATE)
+    rotate_step = int(ROTATE_STEP)
 
     image_dir_name = "images"
 
@@ -67,6 +71,17 @@ if __name__ == "__main__":
 
     font2image = Font2Image(width, height, need_crop, margin)
 
+    if rotate < 0:
+        roate = - rotate
+
+    if rotate > 0 and rotate <= 45:
+        all_rotate_angles = []
+        for i in range(0, rotate+1, rotate_step):
+            all_rotate_angles.append(i)
+        for i in range(-rotate, 0, rotate_step):
+            all_rotate_angles.append(i)
+        #print(all_rotate_angles)
+        
     for i, verified_font_path in enumerate(verified_font_paths):
         is_train = True
         if i >= max_train_i:
@@ -77,18 +92,36 @@ if __name__ == "__main__":
             char_dir = os.path.join(images_dir, "%d" % j)
             if not os.path.isdir(char_dir):
                 os.makedirs(char_dir)
-            path_image = os.path.join(
-                char_dir,
-                "%d_%s.jpg" % (i, os.path.basename(verified_font_path)))
-            relative_path_image = os.path.join(
-                image_dir_name, "%d"%j, 
-                "%d_%s.jpg" % (i, os.path.basename(verified_font_path))
-            )
-            font2image.do(verified_font_path, char, path_image)
-            if is_train:
-                train_list.append((relative_path_image, j))
+            if rotate == 0:
+                path_image = os.path.join(
+                    char_dir,
+                    "%d_%s.jpg" % (i, os.path.basename(verified_font_path)))
+                relative_path_image = os.path.join(
+                    image_dir_name, "%d"%j, 
+                    "%d_%s.jpg" % (i, os.path.basename(verified_font_path))
+                )
+                font2image.do(verified_font_path, char, path_image,)
+                if is_train:
+                    train_list.append((relative_path_image, j))
+                else:
+                    test_list.append((relative_path_image, j))
             else:
-                test_list.append((relative_path_image, j))
+                for k in all_rotate_angles:
+                    if k < 0:
+                        angle_suffix = "_n_%d" % (abs(k))
+                    else:
+                        angle_suffix = "_p_%d" % (abs(k))
+                    path_image = os.path.join(
+                        char_dir,
+                        "%d_%s_%s.jpg" % (i, os.path.basename(verified_font_path), angle_suffix))
+                    relative_path_image = os.path.join(
+                        image_dir_name, "%d" % j,
+                        "%d_%s_%s.jpg" % (i, os.path.basename(verified_font_path), angle_suffix))
+                    if is_train:
+                        train_list.append((relative_path_image, j))
+                    else:
+                        test_list.append((relative_path_image, j))
+                    font2image.do(verified_font_path, char, path_image, rotate=k)
 
     h_y_tag_json_file = open(y_tag_json_file, "w+")
     json.dump(y_to_tag, h_y_tag_json_file)

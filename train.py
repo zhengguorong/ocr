@@ -21,7 +21,7 @@ test_file = 'dataset/test.record'
 image_size = 32
 num_labels = len(open('dataset/y_tag.txt').readlines())
 num_channels = 1
-batch_size = 40
+batch_size = 64
 
 
 def deepnn(x):
@@ -46,15 +46,15 @@ def deepnn(x):
     with tf.name_scope('pool3'):
         h_pool3 = max_pool_2x2(h_conv3)
     with tf.name_scope('fc1'):
-        W_fc1 = weight_variable([4 * 4 * 128, 1024])
-        b_fc1 = bias_variable([1024])
+        W_fc1 = weight_variable([4 * 4 * 128, 2048])
+        b_fc1 = bias_variable([2048])
         h_pool3_flat = tf.reshape(h_pool3, [-1, 4 * 4 * 128])
         h_fc1 = tf.nn.relu(tf.matmul(h_pool3_flat, W_fc1) + b_fc1)
     with tf.name_scope('dropout'):
         keep_prob = tf.placeholder(tf.float32)
         h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
     with tf.name_scope('fc2'):
-        W_fc2 = weight_variable([1024, num_labels])
+        W_fc2 = weight_variable([2048, num_labels])
         b_fc2 = bias_variable([num_labels])
         y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
     return y_conv, keep_prob
@@ -109,12 +109,14 @@ def main(_):
     train_img_batch_tensor, train_label_batch_tensor = tf.train.shuffle_batch(
         [train_img, train_label], batch_size=batch_size, capacity=20000, min_after_dequeue=5000)
     test_img_batch_tensor, test_label_batch_tensor = tf.train.shuffle_batch(
-        [test_img, test_label], batch_size=100, capacity=10000, min_after_dequeue=5000)
+        [test_img, test_label], batch_size=200, capacity=10000, min_after_dequeue=5000)
     init = tf.global_variables_initializer()
+    
     saver = tf.train.Saver()
     with tf.Session() as sess:
+        saver.restore(sess, tf.train.latest_checkpoint('.'))
         summary_writer = tf.summary.FileWriter(SUMMARY_DIR, sess.graph)
-        sess.run(init)
+#         sess.run(init)
         threads = tf.train.start_queue_runners(sess=sess)
         train_img_batch, train_label_batch = sess.run(
             [train_img_batch_tensor, train_label_batch_tensor])
@@ -124,8 +126,10 @@ def main(_):
             if i % 50000 == 0:
                 saver.save(sess, "./crack_capcha.model")
             if i % 100 == 0:
+                train_img_batch, train_label_batch = sess.run(
+                    [train_img_batch_tensor, train_label_batch_tensor])
                 summary, train_accuracy, loss = sess.run([merged, accuracy, cross_entropy], feed_dict={
-                                                         x: test_img_batch, y_: test_label_batch, keep_prob: 1})
+                                                         x: train_img_batch, y_: train_label_batch, keep_prob: 1})
                 summary_writer.add_summary(summary, i)
                 print('Step %d: loss = %g Validation accuracy = %.1f%%' %
                       (i, loss, train_accuracy * 100))

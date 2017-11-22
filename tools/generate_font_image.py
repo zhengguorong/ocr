@@ -25,8 +25,8 @@ if __name__ == "__main__":
     HEIGHT = 32 # 图片高度
     NO_CROP = True # 是否裁切
     MARGIN = 4 # 图片边距
-    LANGS = 'lower_eng' # 生成什么类型的字体
-    ROTATE = 30 # 生成字体旋转角度
+    LANGS = 'chi_sim' # 生成什么类型的字体
+    ROTATE = 0 # 生成字体旋转角度
     ROTATE_STEP = 2 # 步长
 
     out_dataset_dir = os.path.expanduser(OUT_DATASET_DIR)

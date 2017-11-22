@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-from deep_ocr.utils import trim_string
+from utils import trim_string
 
 # I take characters from http://hanyu.iciba.com/zt/3500.html
 data = u'''
